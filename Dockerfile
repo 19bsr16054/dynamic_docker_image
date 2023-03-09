@@ -1,23 +1,41 @@
-FROM python:3.8-slim
+# builder stage (temp)
+FROM python:3.8-slim as builder
 
-RUN useradd --create-home --shell /bin/bash app_user
+WORKDIR /app
 
-WORKDIR /home/app_user
+ENV PYTHONUNBUFFERED 1
 
-RUN apt update && apt install -y python3-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends python3-dev \
                         build-essential \
-                        gcc \
-                        libc-dev
+                        gcc
 
 COPY requirements.txt ./
 
-RUN pip install --no-cache-dir -r "requirements.txt"
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt \
+                        docanalysis
 
-RUN python -m spacy download en_core_web_lg
+#final stage
+FROM python:3.8-slim
 
-USER app_user
+WORKDIR /home/app
+
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
+
+RUN pip install --no-cache /wheels/*
+
+
+# RUN python -m spacy download en_core_web_lg
+
+RUN apt-get update && apt-get install tk -y && apt-get install git -y
+
+#RUN useradd --create-home --shell /bin/bash app_user
+
+#USER app_user
 
 COPY . .
+
+RUN docanalysis --help
 
 CMD ["bash"]
 

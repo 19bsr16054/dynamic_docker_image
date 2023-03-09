@@ -20,7 +20,7 @@ import pandas as pd
 import requests
 import os
 import argparse
-import spacy
+#import spacy
 
 from transformers import (
     TokenClassificationPipeline,
@@ -32,7 +32,7 @@ import numpy as np
 #import os
 #os.environ['TRANSFORMERS_CACHE'] = 'E:\git\transformer_cache'
 
-nlp = spacy.load("en_core_web_lg")
+#nlp = spacy.load("en_core_web_lg")
 
 
 class keyword_extraction():
@@ -112,7 +112,7 @@ class keyword_extraction():
         clean_t = self.text.replace("Final Government Distribution  Chapter 5 IPCC AR6 WGIII", "")
         return self.clean_t'''
 
-    def clean(self, df):
+    '''def clean(self, df):
         def tagger(x):
             return nlp(x)[0].pos_
 
@@ -127,7 +127,7 @@ class keyword_extraction():
         df = df[df.POS.isin(['NOUN', 'PROPN', 'ADJ', 'ADV'])]
         df = df[~df['keyword/phrase'].apply(lambda x: lemma(x)).isin(['http', 'https', 'publication', 'Chapter'])]
         df = df.drop(columns=['Lemma'], axis=0)
-        return df
+        return df'''
 
     def extract_text_fom_html(self):
 
