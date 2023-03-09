@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install tk -y && apt-get install git -y
 
 COPY . .
 
-RUN docanalysis --help
+#RUN docanalysis --help
 
 CMD ["bash"]
 
