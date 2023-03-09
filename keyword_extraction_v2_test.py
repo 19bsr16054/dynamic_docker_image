@@ -33,7 +33,7 @@ import numpy as np
 #os.environ['TRANSFORMERS_CACHE'] = 'E:\git\transformer_cache'
 
 #nlp = spacy.load("en_core_web_lg")
-
+# checking git actions
 
 class keyword_extraction():
     def __init__(self, html_path, saving_path, method):
