@@ -15,7 +15,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.t
                         docanalysis
 
 #final stage
-FROM python:3.8-slim
+FROM python:3.8-alpine
 
 WORKDIR /home/app
 
