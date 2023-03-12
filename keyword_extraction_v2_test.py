@@ -22,12 +22,12 @@ import os
 import argparse
 #import spacy
 
-from transformers import (
+'''from transformers import (
     TokenClassificationPipeline,
     AutoModelForTokenClassification,
     AutoTokenizer,
 )
-from transformers.pipelines import AggregationStrategy
+from transformers.pipelines import AggregationStrategy'''
 import numpy as np
 #import os
 #os.environ['TRANSFORMERS_CACHE'] = 'E:\git\transformer_cache'
@@ -42,6 +42,9 @@ class keyword_extraction():
         self.method = method
         self.text = ''
         self.span_list = []
+        self.API_URL = "https://api-inference.huggingface.co/models/ml6team/keyphrase-extraction-kbir-inspec"
+        self.headers = {"Authorization": "Bearer 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"}
+
 
     
     def read_text_from_html(self):
@@ -153,10 +156,11 @@ class keyword_extraction():
             # TEXT_ = f'Chapter06_text.txt'
             # saving_path = '/content/'
             with open(self.saving_path + 'text.txt', 'w', encoding="utf-8") as file:
-                text = self.text.replace("Final Government Distribution  Chapter 5 IPCC AR6 WGIII", "").replace("Final Government Distribution Chapter 5 IPCC AR6 WGIII", "")
-                for l in text.splitlines():
-                    file.write(l+"\n \n \n")
-                #file.write(text)
+                #text = self.text.replace("Final Government Distribution  Chapter 5 IPCC AR6 WGIII", "").replace("Final Government Distribution Chapter 5 IPCC AR6 WGIII", "")
+                text = re.sub("Final Government Distribution | Chapter 5 | IPCC AR6 WGIII", " ", self.text)
+                '''for l in text.splitlines():
+                    file.write(l+"\n \n \n")'''
+                file.write(text.replace("\n", ""))
                 print("Done Writing File")
                 #print(self.text)
             return self.text
@@ -166,19 +170,30 @@ class keyword_extraction():
         with open(self.text_file, 'r') as f:
             textv2 = f.read()
     
+    def query(self, payload):
+        response = requests.post(self.API_URL, headers=self.headers, json=payload)
+        return response.json()
+
+
+
     def extract_keywords_hf(self):
         self.keyphrases = []
         self.clean_up_html_to_text()
-        model_name = "ml6team/keyphrase-extraction-kbir-inspec"
+        keywords = []
+        
         for line in tqdm(self.text.splitlines()):
             #print(line) 
 
-            extractor = KeyphraseExtractionPipeline(model=model_name)
-            keyphrases = extractor(line)
-            for i in keyphrases:
+            output = self.query({
+	                "inputs": line,
+                    })
+            print(type(output))       
+            keywords = [f['word'] for f in output]
+            for i in keywords:
                 self.keyphrases.append(i)
             #print(self.keyphrases)
         self.keyphrases = [*set(self.keyphrases)]
+        print(self.keyphrases)
         df = pd.DataFrame(self.keyphrases)
         df.to_csv(self.saving_path + 'keyphrases.csv' ,index=False)
         return self.keyphrases
@@ -273,7 +288,7 @@ class keyword_extraction():
         else :
             self.extract_keywords_hf()
         
-class KeyphraseExtractionPipeline(TokenClassificationPipeline):
+'''class KeyphraseExtractionPipeline(TokenClassificationPipeline):
     def __init__(self, model, *args, **kwargs):
         super().__init__(
             model=AutoModelForTokenClassification.from_pretrained(model),
@@ -288,7 +303,7 @@ class KeyphraseExtractionPipeline(TokenClassificationPipeline):
             aggregation_strategy=AggregationStrategy.SIMPLE,
         )
         return np.unique([result.get("word").strip() for result in results])
-    
+    '''
 
 
 
@@ -330,9 +345,11 @@ if __name__ == "__main__":
     text_file = args.text_file
 
     keyword_extractions = keyword_extraction(html_path, saving_path, method)
-    keyword_extractions.main()
+    
     if args.html2text:
         keyword_extractions.extract_text_fom_html()
+    else:
+        keyword_extractions.main()
     
 
     
