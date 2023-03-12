@@ -186,8 +186,9 @@ class keyword_extraction():
 
             output = self.query({
 	                "inputs": line,
+                    "options": "wait_for_model=true"
                     })
-            print(type(output))       
+            #print(type(output))       
             keywords = [f['word'] for f in output]
             for i in keywords:
                 self.keyphrases.append(i)
