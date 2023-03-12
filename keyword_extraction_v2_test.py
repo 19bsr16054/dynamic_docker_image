@@ -8,14 +8,14 @@ Original file is located at
 """
 from tqdm import tqdm
 from bs4 import BeautifulSoup
-from keybert import KeyBERT
-from multi_rake import Rake
-from summa import keywords
+#from keybert import KeyBERT
+#from multi_rake import Rake
+#from summa import keywords
 import re
 import json
-import yake
-from gensim.summarization import keywords
-from IPython.display import HTML
+#import yake
+#from gensim.summarization import keywords
+#from IPython.display import HTML
 import pandas as pd
 import requests
 import os
@@ -165,51 +165,6 @@ class keyword_extraction():
 
         with open(self.text_file, 'r') as f:
             textv2 = f.read()
-
-    def extract_keywords_rake(self):
-        rake = Rake()
-        self.extract_text_fom_html()
-        keywords_Rake = rake.apply(self.text)
-        df_Rake = pd.DataFrame(keywords_Rake)
-        df_Rake.rename(columns={0: 'keyword/phrase', 1: 'score'}, inplace=True)
-        df_Rake = self.clean(df_Rake)
-        df_Rake.to_csv(self.saving_path + 'Rake_keywords.csv', index=None)
-
-    def extract_keywords_gensim(self):
-        self.extract_text_fom_html()
-        keywords_gensim = keywords(self.text, words=100, scores=True, pos_filter=('NN', 'ADJ'), lemmatize=False,
-                                   deacc=False)  # run over all parameters
-        df_gensim = pd.DataFrame(keywords_gensim)
-        df_gensim.rename(columns={0: 'keyword/phrase', 1: 'score'}, inplace=True)
-        df_gensim = self.clean(df_gensim)
-        df_gensim.to_csv(self.saving_path + 'gensim_keywords.csv', index=None)
-
-    def extract_keywords_yake(self):
-        self.extract_text_fom_html()
-        kw_extractor = yake.KeywordExtractor(top=100, stopwords=None, )
-        keywords_yake = kw_extractor.extract_keywords(self.text)
-        df_yake =pd.DataFrame(keywords_yake)
-        df_yake.rename(columns = {0:'keyword/phrase',1:'score'}, inplace = True)
-        #df_yake = self.clean(df_yake)
-        df_yake['keyword/phrase'].to_csv(self.saving_path +'yake_keywords.csv',index=None) 
-
-    def extract_keywords_textrank(self):
-        self.extract_text_fom_html()
-        keywords_textrank = keywords.keywords(self.text, scores=True)
-        df_textrank = pd.DataFrame(keywords_textrank)
-        df_textrank.rename(columns={0: 'keyword/phrase', 1: 'score'}, inplace=True)
-        df_textrank = self.clean(df_textrank)
-        df_textrank.to_csv(self.saving_path + 'textrank_keywords.csv', index=None)
-
-    def extract_keywords_keyBERT(self):
-        self.extract_text_fom_html()
-        kw_model = KeyBERT(model='all-mpnet-base-v2')
-        keywords_keyBERT = kw_model.extract_keywords(self.text,
-                                                     keyphrase_ngram_range=(1, 3),
-                                                     stop_words='english',
-
-                                                     top_n=100)
-        print(keywords_keyBERT)
     
     def extract_keywords_hf(self):
         self.keyphrases = []
