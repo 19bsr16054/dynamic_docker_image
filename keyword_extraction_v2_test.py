@@ -188,12 +188,13 @@ class keyword_extraction():
 	                "inputs": line,
                     "options": "wait_for_model=true"
                     })
-            #print(type(output))       
-            keywords = [f['word'] for f in output]
-            for i in keywords:
-                self.keyphrases.append(i)
+            #print(type(output))
+            json.dumps(output)       
+            for f in output:
+                keywords.append(f['word'])
+            
             #print(self.keyphrases)
-        self.keyphrases = [*set(self.keyphrases)]
+        self.keyphrases = [*set(keywords)]
         print(self.keyphrases)
         df = pd.DataFrame(self.keyphrases)
         df.to_csv(self.saving_path + 'keyphrases.csv' ,index=False)
