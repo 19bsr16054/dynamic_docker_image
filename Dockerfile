@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3-dev \
 
 COPY requirements.txt ./
 
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt \
+                                docanalysis
                                 
 #final stage
 FROM python:3.8-slim
